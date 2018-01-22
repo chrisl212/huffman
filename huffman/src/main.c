@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 			_usage(pname);
 			return EXIT_FAILURE;
 		}
-		fprintf(stdout, "b\n");
+		return dehuff_b(argv[2], argv[3]);
 	} else if (strcmp(opt, "-c") == 0) {
 		if (argc != 5) {
 				_usage(pname);

@@ -105,6 +105,15 @@ HuffNode *_build_tree_b(char *str) {
 			str++;
 		}
 	}
+	while (root->next && root->next->next) {
+		HuffNode *right = _huff_pop(root);
+		HuffNode *left = _huff_pop(root);
+		HuffNode *new = _huff_new(0);
+		new->ascii = 0;
+		new->left = left;
+		new->right = right;
+		_huff_push(root, new);
+	}
 	HuffNode *ret = _huff_pop(root);
 	_huff_free(root);
 	return ret;
@@ -159,15 +168,15 @@ int _decompress_to_f(HuffNode *root, char *compressed_buf, FILE *decompressed_f,
 
 void ph(HuffNode *n) {
 	if (n->left) {
-		printf("0");
 		ph(n->left);
 	}
 	if (n->right) {
-		printf("1");
 		ph(n->right);
 	}
 	if (n->ascii) {
-		printf("%c", n->val);
+		printf("1%c", n->val);
+	} else {
+		printf("0");
 	}
 }
 
@@ -184,7 +193,6 @@ int dehuff_c(const char *compressed_path, const char *code_path, const char *dec
 	huff_raw[header.header_size-1] = 0; //cuts off last 0
 
 	HuffNode *root = _build_tree_c(huff_raw);
-	ph(root);
 	free(huff_raw);
 	FILE *code_f = fopen(code_path, "w");
 	if (!code_f) {
@@ -220,7 +228,6 @@ int dehuff_b(const char *compressed_path, const char *decompressed_path) {
 	fread(huff_raw, 1, header.header_size, compressed_f);	
 
 	HuffNode *root = _build_tree_b(huff_raw);
-	ph(root);
 	free(huff_raw);
 
 	long compressed_size = header.compressed_size-header.header_size-3*sizeof(long);
