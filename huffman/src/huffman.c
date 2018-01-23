@@ -4,13 +4,6 @@
 #include "huffman.h"
 #include "huffnode.h"
 
-//structure for the header of the file containing the three important numbers
-typedef struct _Head {
-	long compressed_size;
-	long header_size;
-	long decompressed_size;
-} Header;
-
 //builds a binary tree from a bit-encoded header
 HuffNode *_build_tree(char *str, char opt) {
 	HuffNode *root = huff_new(0); //creates the root node of the stack
