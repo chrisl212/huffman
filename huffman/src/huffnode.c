@@ -3,6 +3,7 @@
 #include <string.h>
 #include "huffnode.h"
 
+//creates a new huffnode with the given value
 HuffNode *huff_new(char val) {
 	HuffNode *new = calloc(1, sizeof(*new));
 	new->val = val;
@@ -10,6 +11,7 @@ HuffNode *huff_new(char val) {
 	return new;
 }
 
+//pops a huff node from the stack and returns it
 HuffNode *huff_pop(HuffNode *list) {
 	while (list->next->next) {
 		list = list->next;
@@ -19,6 +21,7 @@ HuffNode *huff_pop(HuffNode *list) {
 	return pop;
 }
 
+//pushes a huffnode onto the stack
 void huff_push(HuffNode *list, HuffNode *new) {
 	while (list->next) {
 		list = list->next;
@@ -26,6 +29,7 @@ void huff_push(HuffNode *list, HuffNode *new) {
 	list->next = new;
 }
 
+//frees a huffnode and all of its related nodes
 void huff_free(HuffNode *node) {
 	if (node->next) {
 		huff_free(node->next);
@@ -39,6 +43,7 @@ void huff_free(HuffNode *node) {
 	free(node);
 }
 
+//prints a huffnode's tree to a file
 void fprint_huff(FILE *f, HuffNode *node, char *str, int size) {
 	if (!node) {
 		//returns if the pointer is NULL

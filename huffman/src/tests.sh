@@ -1,31 +1,37 @@
 #!/bin/bash 
 
-./huff -c ../char_based_header/gophers.hch tests/code/gophers.code tests/gophers.ch
-./huff -c ../char_based_header/binary2.hch tests/code/binary2.code tests/binary2.ch
-./huff -c ../char_based_header/lorum.hch tests/code/lorum.code tests/lorum.ch
-./huff -c ../char_based_header/stone.hch tests/code/stone.code tests/stone.ch
-./huff -c ../char_based_header/woods.hch tests/code/woods.code tests/woods.ch
+if [ ! -d "tests" ]; then
+	mkdir tests
+	mkdir tests/code
+	mkdir tests/mem
+fi
 
-diff ../original/gophers tests/gophers.ch
-diff ../original/binary2 tests/binary2.ch
-diff ../original/lorum tests/lorum.ch
-diff ../original/stone tests/stone.ch
-diff ../original/woods tests/woods.ch
+NAMES=(gophers binary2 lorum stone woods);
 
-diff ../code/gophers.code tests/code/gophers.code 
-diff ../code/binary2.code tests/code/binary2.code 
-diff ../code/lorum.code tests/code/lorum.code 
-diff ../code/stone.code tests/code/stone.code 
-diff ../code/woods.code tests/code/woods.code 
+total=0
+for ((i=0; i<5; i++)) do
+	name=${NAMES[i]}
+	valgrind --log-file="tests/mem/$name.ch" ./huff -c ../char_based_header/$name.hch tests/code/$name.code tests/$name.ch 
+	grep -q "ERROR SUMMARY: 0 errors" tests/mem/$name.ch
+	ret=$?
+	total=$((total+$ret))
+	if [ $ret != 0 ]; then
+		echo "Memory issue for $name char header"
+	fi
+	diff ../original/$name tests/$name.ch
+	total=$((total+$?))
+	diff ../code/$name.code tests/code/$name.code
+	total=$((total+$?))
+	valgrind --log-file="tests/mem/$name.bit" ./huff -b ../bit_based_header/$name.hbt tests/$name.bit
+	grep -q "ERROR SUMMARY: 0 errors" tests/mem/$name.bit
+	ret=$?
+	total=$((total+$ret))
+	if [ $ret != 0 ]; then
+		echo "Memory issue for $name bit header"
+	fi
+	diff ../original/$name tests/$name.bit
+	total=$((total+$?))
+done
 
-./huff -b ../bit_based_header/gophers.hbt tests/gophers.bit
-./huff -b ../bit_based_header/binary2.hbt tests/binary2.bit
-./huff -b ../bit_based_header/lorum.hbt tests/lorum.bit
-./huff -b ../bit_based_header/stone.hbt tests/stone.bit
-./huff -b ../bit_based_header/woods.hbt tests/woods.bit
-
-diff ../original/gophers tests/gophers.bit
-diff ../original/binary2 tests/binary2.bit
-diff ../original/lorum tests/lorum.bit
-diff ../original/stone tests/stone.bit
-diff ../original/woods tests/woods.bit
+echo "$((25-total)) of 25 tests passed."
+rm -R tests

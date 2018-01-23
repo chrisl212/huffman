@@ -19,13 +19,13 @@ int main(int argc, char **argv) {
 			_usage(pname);
 			return EXIT_FAILURE;
 		}
-		return dehuff_b(argv[2], argv[3]);
+		return dehuff(argv[2], NULL, argv[3], 'b');
 	} else if (strcmp(opt, "-c") == 0) {
 		if (argc != 5) {
 			_usage(pname);
 			return EXIT_FAILURE;
 		}
-		return dehuff_c(argv[2], argv[3], argv[4]);
+		return dehuff(argv[2], argv[3], argv[4], 'c');
 	} else {
 		_usage(pname);
 		return EXIT_FAILURE;
